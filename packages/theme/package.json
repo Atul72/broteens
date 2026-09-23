@@ -1,0 +1,11 @@
+{
+  "name": "@broteens/theme",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./colors.css": "./colors.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}
