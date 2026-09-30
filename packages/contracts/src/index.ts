@@ -12,7 +12,7 @@ export const crawlConfigSchema = z.object({
   useMainContentOnly: z.boolean().default(true),
   renderJavaScript: renderJavascriptSchema.default("auto"),
   respectRobotsTxt: z.boolean().default(true),
-  requestTimeOutMs: z.coerce
+  requestTimeoutMs: z.coerce
     .number()
     .int()
     .min(1000)

@@ -1,0 +1,24 @@
+{
+  "name": "@crawler/core",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@broteens/contracts": "workspace:*",
+    "@broteens/extractor": "workspace:*",
+    "crawlee": "^3.15.1",
+    "minimatch": "^10.0.3",
+    "playwright": "^1.55.0",
+    "robots-parser": "^3.0.1",
+    "tldts": "^7.0.14"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

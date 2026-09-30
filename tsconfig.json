@@ -14,13 +14,12 @@
     "declaration": true,
     "baseUrl": ".",
     "paths": {
-      "@broteens/contracts": ["packages/contracts/src/index.ts"]
+      "@broteens/contracts": ["packages/contracts/src/index.ts"],
+      "@broteens/extractor": ["packages/extractor/src/index.ts"],
+      "@broteens/queue": ["packages/queue/src/index.ts"],
+      "@broteens/database": ["packages/database/src/index.ts"],
+      "@broteens/core": ["packages/crawler/src/index.ts"]
     }
   },
   "exclude": ["node_modules"]
 }
-
-//   "@crawler/database": ["packages/database/src/index.ts"],
-//   "@crawler/queue": ["packages/queue/src/index.ts"],
-//   "@crawler/extractor": ["packages/extractor/src/index.ts"],
-//   "@crawler/core": ["packages/crawler/src/index.ts"]
