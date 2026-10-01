@@ -4,7 +4,7 @@ import * as schema from "./schema.js";
 
 const connectionString =
   process.env.DATABASE_URL ??
-  "postgresql://crawler:crawler@localhost:5433/broteens";
+  "postgresql://broteens:broteens@localhost:5433/broteens";
 
 export const sql = postgres(connectionString, {
   max: 10,

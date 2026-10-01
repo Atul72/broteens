@@ -28,6 +28,13 @@ export const userStatusEnum = pgEnum("user_status", [
   "banned",
   "deleted",
 ]);
+export const authProviderEnum = pgEnum("auth_provider", ["password", "google"]);
+
+export const authTokenTypeEnum = pgEnum("auth_token_type", [
+  "access",
+  "refresh",
+  "password_reset",
+]);
 
 export const crawlStatusEnum = pgEnum("crawl_status", [
   "queued",
@@ -43,6 +50,82 @@ export const pageStatusEnum = pgEnum("page_status", [
   "failed",
   "skipped",
 ]);
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: varchar("email", { length: 320 }).notNull(),
+    passwordHash: text("password_hash"),
+    fullName: varchar("full_name", { length: 200 }).notNull(),
+    avatarUrl: text("avatar_url"),
+    role: userRoleEnum("role").notNull().default("user"),
+    status: userStatusEnum("status").notNull().default("active"),
+    emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [uniqueIndex("users_email_uq").on(table.email)],
+);
+
+export const authAccounts = pgTable(
+  "auth_accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provider: authProviderEnum("provider").notNull(),
+    providerAccountId: varchar("provider_account_id", {
+      length: 255,
+    }).notNull(),
+    providerEmail: varchar("provider_email", { length: 320 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("auth_accounts_provider_account_uq").on(
+      table.provider,
+      table.providerAccountId,
+    ),
+    index("auth_accounts_user_idx").on(table.userId),
+  ],
+);
+
+export const authTokens = pgTable(
+  "auth_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: authTokenTypeEnum("type").notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    sessionId: uuid("session_id").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    ipAddress: varchar("ip_address", { length: 64 }),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("auth_tokens_hash_uq").on(table.tokenHash),
+    index("auth_tokens_user_idx").on(table.userId),
+    index("auth_tokens_session_idx").on(table.sessionId),
+    index("auth_tokens_expiry_idx").on(table.expiresAt),
+  ],
+);
 
 export const crawlJobs = pgTable(
   "crawl_jobs",
@@ -131,3 +214,7 @@ export type CrawlJob = typeof crawlJobs.$inferSelect;
 export type CrawlPage = typeof crawlPages.$inferSelect;
 export type NewCrawlPage = typeof crawlPages.$inferInsert;
 export type NewCrawlLink = typeof crawlLinks.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type AuthAccount = typeof authAccounts.$inferSelect;
+export type AuthToken = typeof authTokens.$inferSelect;

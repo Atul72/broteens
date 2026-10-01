@@ -1,0 +1,28 @@
+{
+  "name": "@broteens/auth",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@broteens/database": "workspace:*",
+    "@broteens/errors": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "0.44.5",
+    "express": "^5.2.1",
+    "google-auth-library": "^10.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.0.0",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.7"
+  }
+}
