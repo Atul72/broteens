@@ -19,7 +19,9 @@
       "@broteens/database": ["./packages/database/src/index.ts"],
       "@broteens/core": ["./packages/crawler/src/index.ts"],
       "@broteens/auth": ["./packages/auth/src/index.ts"],
-      "@broteens/errors": ["./packages/errors/src/index.ts"]
+      "@broteens/errors": ["./packages/errors/src/index.ts"],
+      "@broteens/features": ["./packages/features/src/index.ts"],
+      "@broteens/hooks": ["./packages/hooks/src/index.ts"]
     }
   },
   "exclude": ["node_modules"]

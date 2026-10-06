@@ -10,6 +10,7 @@ import {
   resetPasswordSchema,
   signInSchema,
   signUpSchema,
+  updateProfileSchema,
 } from "./schemas.js";
 import {
   AuthService,
@@ -147,6 +148,14 @@ export function createAuthRouter(options: CreateAuthRouterOptions): Router {
 
   router.get("/me", requireAuth, (_request, response) => {
     response.status(200).json({ user: getAuthContext(response.locals).user });
+  });
+
+  router.patch("/profile", requireAuth, async (request, response) => {
+    const user = await service.updateProfile(
+      getAuthContext(response.locals).userId,
+      body(updateProfileSchema, request.body),
+    );
+    response.status(200).json({ user });
   });
 
   return router;

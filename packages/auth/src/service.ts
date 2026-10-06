@@ -27,6 +27,7 @@ import type {
   ResetPasswordInput,
   SignInInput,
   SignUpInput,
+  UpdateProfileInput,
 } from "./schemas.js";
 
 const INVALID_CREDENTIALS = new AppError(
@@ -86,6 +87,7 @@ function isUniqueViolation(error: unknown): boolean {
 export class AuthService {
   private readonly googleClient: OAuth2Client;
 
+  // The constructor initializes the google client with the provided Google client ID from the configuration options.
   constructor(private readonly options: AuthServiceOptions) {
     this.googleClient = new OAuth2Client(options.config.googleClientId);
   }
@@ -264,6 +266,7 @@ export class AuthService {
 
     const email = payload.email.trim().toLowerCase();
     const user = await db.transaction(async (tx) => {
+      // Step 1: First, check if the Google account is already linked to a user.
       const [linked] = await tx
         .select({ user: users })
         .from(authAccounts)
@@ -277,6 +280,7 @@ export class AuthService {
         .limit(1);
       if (linked) return linked.user;
 
+      // Step 2: If not linked, check if a user with the same email exists.
       let [existing] = await tx
         .select()
         .from(users)
@@ -311,6 +315,7 @@ export class AuthService {
         throw new AppError(500, "USER_CREATE_FAILED", "Could not create user");
       }
 
+      // Step 3: Link the Google account to the existing user.
       await tx
         .insert(authAccounts)
         .values({
@@ -342,6 +347,7 @@ export class AuthService {
       return resolved.user;
     });
 
+    // Step 4: Ensure the user is active and generate a new token pair and return the authentication result.
     this.assertActive(user);
     const tokens = await this.storePair(db, user.id, metadata);
     return { user: publicUser(user), ...tokens };
@@ -439,6 +445,26 @@ export class AuthService {
       .update(authTokens)
       .set({ revokedAt: new Date() })
       .where(and(eq(authTokens.userId, userId), isNull(authTokens.revokedAt)));
+  }
+
+  async updateProfile(
+    userId: string,
+    input: UpdateProfileInput,
+  ): Promise<PublicUser> {
+    const [user] = await db
+      .update(users)
+      .set({
+        fullName: input.fullName,
+        avatarUrl: input.avatarUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) {
+      throw new AppError(404, "USER_NOT_FOUND", "User account was not found");
+    }
+    this.assertActive(user);
+    return publicUser(user);
   }
 
   async forgotPassword(input: ForgotPasswordInput): Promise<void> {

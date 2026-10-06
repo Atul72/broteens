@@ -48,6 +48,7 @@ All routes are relative to the mount path:
 - `POST /forgot-password`
 - `POST /reset-password`
 - `GET /me` (Bearer access token required)
+- `PATCH /profile` (Bearer access token required)
 
 Run `pnpm --filter @broteens/database db:generate` and apply the generated migration before serving requests.
 

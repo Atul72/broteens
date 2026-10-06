@@ -1,0 +1,28 @@
+{
+  "name": "@broteens/features",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@broteens/errors": "workspace:*",
+    "@broteens/hooks": "workspace:*",
+    "@react-oauth/google": "^0.12.2",
+    "@repo/ui": "workspace:*",
+    "react-hook-form": "^7.65.0"
+  },
+  "peerDependencies": {
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "5.9.2"
+  }
+}

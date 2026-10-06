@@ -51,9 +51,15 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const updateProfileSchema = z.strictObject({
+  fullName: z.string().trim().min(2).max(200),
+  avatarUrl: z.url().max(2_000).nullable(),
+});
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;
 export type RefreshInput = z.infer<typeof refreshSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
