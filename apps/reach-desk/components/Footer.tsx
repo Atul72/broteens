@@ -2,9 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ReachdeskLogo } from "./ReachdeskLogo";
+import { shouldShowFooter } from "@/libs/routes";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Based on route configuration, internal routes (e.g. /settings) hide the footer
+  if (!shouldShowFooter(pathname)) {
+    return null;
+  }
   return (
     <footer className="relative z-10 bg-white border-t border-slate-200/80 pt-10 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
