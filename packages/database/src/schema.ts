@@ -127,6 +127,8 @@ export const authTokens = pgTable(
   ],
 );
 
+// These tables specifically for the crawling, no use in the reach-desk but they may exist in the db, not have any concerns if we talk about the reach-desk.
+
 export const crawlJobs = pgTable(
   "crawl_jobs",
   {
