@@ -1,9 +1,10 @@
 "use client";
 
-import React, { type ReactNode } from "react";
+import React, { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { ReachdeskLogo } from "./ReachdeskLogo";
+import { Spinner } from "./Spinner";
 
 export interface AuthShellProps {
   children: ReactNode;
@@ -13,6 +14,9 @@ export interface AuthShellProps {
   subheadline?: string;
   featureTitle?: string;
   featurePoints?: string[];
+  guestOnly?: boolean;
+  fallback?: ReactNode;
+  authApiUrl?: string;
 }
 
 export function AuthShell({
@@ -27,7 +31,132 @@ export function AuthShell({
     "Contact imports with clear validation",
     "Delivery insights and opt-out tracking",
   ],
+  guestOnly = true,
+  fallback,
+  authApiUrl = process.env.NEXT_PUBLIC_AUTH_API_URL ??
+    "http://localhost:4000/v1/auth",
 }: AuthShellProps) {
+  // Start in "checking" state when guestOnly is active so that neither SSR
+  // nor initial client paint renders the login/signup form before session verification.
+  const [authStatus, setAuthStatus] = useState<
+    "checking" | "authenticated" | "guest"
+  >(guestOnly ? "checking" : "guest");
+  const [redirectMessage, setRedirectMessage] = useState<string>(
+    "Checking session...",
+  );
+
+  useEffect(() => {
+    if (!guestOnly) {
+      setAuthStatus("guest");
+      return;
+    }
+
+    let isMounted = true;
+
+    async function checkAuth() {
+      try {
+        const raw =
+          typeof window !== "undefined"
+            ? localStorage.getItem("broteens.auth.session")
+            : null;
+
+        if (!raw) {
+          if (isMounted) setAuthStatus("guest");
+          return;
+        }
+
+        let parsed: {
+          accessToken?: string;
+          accessTokenExpiresAt?: string;
+        } | null = null;
+
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          localStorage.removeItem("broteens.auth.session");
+          if (isMounted) setAuthStatus("guest");
+          return;
+        }
+
+        const token = parsed?.accessToken;
+        if (!token) {
+          localStorage.removeItem("broteens.auth.session");
+          if (isMounted) setAuthStatus("guest");
+          return;
+        }
+
+        // Verify expiration timestamp if provided in the session payload
+        if (parsed?.accessTokenExpiresAt) {
+          const expiresAt = new Date(parsed.accessTokenExpiresAt).getTime();
+          if (!isNaN(expiresAt) && expiresAt <= Date.now()) {
+            localStorage.removeItem("broteens.auth.session");
+            if (isMounted) setAuthStatus("guest");
+            return;
+          }
+        }
+
+        // Session exists and is locally valid - show redirect feedback
+        if (isMounted) {
+          setAuthStatus("authenticated");
+          setRedirectMessage("Redirecting to your workspace...");
+        }
+
+        // Optional backend token verification with /v1/auth/me
+        try {
+          const res = await fetch(`${authApiUrl.replace(/\/$/, "")}/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!isMounted) return;
+
+          if (res.status === 401 || res.status === 403) {
+            // Token was revoked or expired on backend
+            localStorage.removeItem("broteens.auth.session");
+            setAuthStatus("guest");
+            return;
+          }
+        } catch {
+          // If the backend is offline or network is degraded, proceed with local valid session
+        }
+
+        if (isMounted) {
+          window.location.replace("/settings");
+        }
+      } catch {
+        if (isMounted) setAuthStatus("guest");
+      }
+    }
+
+    void checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [guestOnly, authApiUrl]);
+
+  // While checking session or redirecting on a guest-only route, show the Spinner fallback
+  if (
+    guestOnly &&
+    (authStatus === "checking" || authStatus === "authenticated")
+  ) {
+    if (fallback) {
+      return <>{fallback}</>;
+    }
+
+    return (
+      <Spinner
+        fullScreen
+        size="lg"
+        label={redirectMessage}
+        sublabel={
+          authStatus === "authenticated"
+            ? "Taking you straight to your account settings"
+            : "Verifying your workspace access"
+        }
+      />
+    );
+  }
+
   return (
     <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 bg-[#FAF7FD] lg:bg-white selection:bg-lavender-200 selection:text-lavender-900">
       {/* Left Column: Brand & Feature Showcase in Deep Lavender Theme (Desktop only) */}

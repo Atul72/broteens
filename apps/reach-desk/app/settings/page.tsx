@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { SettingsScreen } from "@broteens/features";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Spinner } from "@/components/Spinner";
 
 export const metadata: Metadata = {
   title: "Settings - Reachdesk",
@@ -16,7 +18,18 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-lavender-200 selection:text-lavender-900">
       <Navbar />
       <div className="flex-1 w-full">
-        <SettingsScreen apiBaseUrl={authApiUrl} />
+        <Suspense
+          fallback={
+            <Spinner
+              fullScreen
+              size="lg"
+              label="Loading workspace settings..."
+              sublabel="Preparing your profile and channel preferences"
+            />
+          }
+        >
+          <SettingsScreen apiBaseUrl={authApiUrl} />
+        </Suspense>
       </div>
       <Footer />
     </div>
