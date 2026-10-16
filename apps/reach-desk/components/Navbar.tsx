@@ -3,16 +3,23 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
 import { ChevronDown } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { session } = useAuthSession();
   const pathname = usePathname();
 
   const isFeaturesPage = pathname === "/features";
   const isHomePage = pathname === "/" || pathname === "";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,18 +115,36 @@ export function Navbar() {
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <a
-              href="#login"
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 px-3 py-2 transition-colors"
-            >
-              Log in
-            </a>
-            <a
-              href="#start"
-              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-lavender-600 hover:bg-lavender-700 rounded-full shadow-md shadow-lavender-500/20 hover:shadow-lavender-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-            >
-              Get Started Free
-            </a>
+            {mounted && session ? (
+              <Link
+                href="/settings"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-lavender-50 text-slate-800 transition-colors border border-slate-200"
+              >
+                <div className="w-8 h-8 rounded-full bg-lavender-600 text-white font-bold text-xs grid place-items-center uppercase shadow-sm">
+                  {session.user.fullName
+                    ? session.user.fullName.slice(0, 2)
+                    : session.user.email.slice(0, 2)}
+                </div>
+                <span className="text-sm font-semibold text-slate-800 max-w-[120px] truncate">
+                  {session.user.fullName || "Settings"}
+                </span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-slate-700 hover:text-slate-900 px-3 py-2 transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-lavender-600 hover:bg-lavender-700 rounded-full shadow-md shadow-lavender-500/20 hover:shadow-lavender-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                >
+                  Get Started Free
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Animated Mobile Menu Button (Hamburger to X) */}
@@ -222,20 +247,33 @@ export function Navbar() {
             </nav>
 
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
-              <a
-                href="#login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl border border-slate-200 transition-colors"
-              >
-                Log in
-              </a>
-              <a
-                href="#start"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-3 text-sm font-semibold text-white bg-lavender-600 hover:bg-lavender-700 rounded-xl shadow-md shadow-lavender-500/20 active:scale-[0.99] transition-all"
-              >
-                Get Started Free
-              </a>
+              {mounted && session ? (
+                <Link
+                  href="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-sm font-semibold text-lavender-700 bg-lavender-50 hover:bg-lavender-100 rounded-xl border border-lavender-200 transition-colors"
+                >
+                  Workspace Settings (
+                  {session.user.fullName || session.user.email})
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl border border-slate-200 transition-colors"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-3 text-sm font-semibold text-white bg-lavender-600 hover:bg-lavender-700 rounded-xl shadow-md shadow-lavender-500/20 active:scale-[0.99] transition-all"
+                  >
+                    Get Started Free
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

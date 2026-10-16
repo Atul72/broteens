@@ -48,3 +48,33 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Reachdesk Lavender Theme Overrides for Auth Forms & Settings */
+.reachdesk-auth-form button[type="submit"] {
+  background-color: #8646d8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(134, 70, 216, 0.25) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.reachdesk-auth-form button[type="submit"]:hover {
+  background-color: #7333c4 !important;
+  box-shadow: 0 6px 20px 0 rgba(134, 70, 216, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.reachdesk-auth-form input:focus {
+  border-color: #8646d8 !important;
+  --tw-ring-color: #8646d8 !important;
+}
+
+.reachdesk-auth-form .text-amber-700,
+.reachdesk-auth-form a.text-slate-950:hover,
+.text-amber-600 {
+  color: #8646d8 !important;
+}
+
+.reachdesk-auth-form .hover\:text-amber-800:hover,
+.reachdesk-auth-form .hover\:text-amber-700:hover {
+  color: #7333c4 !important;
+}

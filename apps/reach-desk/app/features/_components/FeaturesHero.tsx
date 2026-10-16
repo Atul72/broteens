@@ -34,7 +34,7 @@ export function FeaturesHero() {
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
-                href="#start"
+                href="/signup"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-lavender-600 hover:bg-lavender-700 shadow-md shadow-lavender-500/25 transition-all"
               >
                 Explore the platform

@@ -55,7 +55,7 @@ export function Hero() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
               <a
-                href="#start"
+                href="/signup"
                 className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-white bg-lavender-600 hover:bg-lavender-700 active:scale-[0.98] shadow-lg shadow-lavender-500/25 transition-all text-sm sm:text-base group"
               >
                 <span>Start Free Trial</span>

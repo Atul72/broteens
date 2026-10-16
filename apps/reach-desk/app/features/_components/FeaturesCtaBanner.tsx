@@ -24,7 +24,7 @@ export function FeaturesCtaBanner() {
             {/* Right Action Button & Subtext (Centered together) */}
             <div className="flex flex-col items-center justify-center shrink-0">
               <a
-                href="#start"
+                href="/signup"
                 className="inline-flex items-center justify-center px-7 py-3 rounded-full text-sm font-semibold text-white bg-lavender-500 hover:bg-lavender-400 active:scale-[0.98] shadow-md shadow-lavender-950/25 transition-all text-center"
               >
                 Get started free

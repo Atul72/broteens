@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAsyncAction } from "@broteens/hooks";
 import { Alert } from "@repo/ui";
@@ -22,7 +22,27 @@ function GoogleButton({
   onSuccess,
   redirectTo,
 }: Omit<GoogleAuthButtonProps, "clientId">) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [buttonWidth, setButtonWidth] = useState<string>("384");
   const { setSession } = useAuthSession();
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const calculateWidth = () => {
+      if (containerRef.current) {
+        const clientWidth = containerRef.current.clientWidth;
+        if (clientWidth > 0) {
+          // Google button width must be between 200 and 400 pixels
+          const clamped = Math.min(400, Math.max(200, Math.floor(clientWidth)));
+          setButtonWidth(String(clamped));
+        }
+      }
+    };
+    calculateWidth();
+    window.addEventListener("resize", calculateWidth);
+    return () => window.removeEventListener("resize", calculateWidth);
+  }, []);
+
   const authenticate = useCallback(
     (credential: string) => authenticateWithGoogle(apiBaseUrl, credential),
     [apiBaseUrl],
@@ -42,8 +62,13 @@ function GoogleButton({
   }
 
   return (
-    <div className="space-y-3">
-      <div className={isPending ? "pointer-events-none opacity-60" : ""}>
+    <div className="w-full space-y-3">
+      <div
+        ref={containerRef}
+        className={`flex w-full justify-center ${
+          isPending ? "pointer-events-none opacity-60" : ""
+        }`}
+      >
         <GoogleLogin
           onSuccess={(response) => void handleCredential(response.credential)}
           onError={() => void handleCredential()}
@@ -51,6 +76,11 @@ function GoogleButton({
           size="large"
           text="continue_with"
           theme="outline"
+          width={buttonWidth}
+          containerProps={{
+            className: "flex justify-center w-full",
+            style: { width: "100%", display: "flex", justifyContent: "center" },
+          }}
         />
       </div>
       {error ? <Alert variant="error">{error.message}</Alert> : null}

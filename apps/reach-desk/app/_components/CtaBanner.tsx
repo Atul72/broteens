@@ -49,7 +49,7 @@ export function CtaBanner() {
             {/* Right: CTA Button */}
             <div className="w-full sm:w-auto shrink-0">
               <a
-                href="#start"
+                href="/signup"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-lavender-700 bg-white hover:bg-slate-50 active:scale-[0.98] shadow-lg shadow-black/10 transition-all text-sm sm:text-base group"
               >
                 <span>Get Started Free</span>
