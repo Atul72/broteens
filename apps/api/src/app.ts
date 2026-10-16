@@ -59,7 +59,11 @@ export function createApp(): Express {
 
   app.disable("x-powered-by");
   app.set("trust proxy", environmentNumber("TRUST_PROXY", 0));
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    }),
+  );
   app.use(
     cors({
       credentials: true,
