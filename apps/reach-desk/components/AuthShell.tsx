@@ -3,6 +3,7 @@
 import React, { useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { performTokenRefresh, type AuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
 import { Spinner } from "./Spinner";
 
@@ -65,10 +66,7 @@ export function AuthShell({
           return;
         }
 
-        let parsed: {
-          accessToken?: string;
-          accessTokenExpiresAt?: string;
-        } | null = null;
+        let parsed: AuthSession | null = null;
 
         try {
           parsed = JSON.parse(raw);
@@ -78,7 +76,7 @@ export function AuthShell({
           return;
         }
 
-        const token = parsed?.accessToken;
+        let token = parsed?.accessToken;
         if (!token) {
           localStorage.removeItem("broteens.auth.session");
           if (isMounted) setAuthStatus("guest");
@@ -89,9 +87,24 @@ export function AuthShell({
         if (parsed?.accessTokenExpiresAt) {
           const expiresAt = new Date(parsed.accessTokenExpiresAt).getTime();
           if (!isNaN(expiresAt) && expiresAt <= Date.now()) {
-            localStorage.removeItem("broteens.auth.session");
-            if (isMounted) setAuthStatus("guest");
-            return;
+            // Access token has expired: silently refresh using refreshToken
+            if (parsed.refreshToken) {
+              const refreshed = await performTokenRefresh(
+                authApiUrl,
+                parsed as AuthSession,
+              );
+              if (refreshed?.accessToken) {
+                token = refreshed.accessToken;
+              } else {
+                localStorage.removeItem("broteens.auth.session");
+                if (isMounted) setAuthStatus("guest");
+                return;
+              }
+            } else {
+              localStorage.removeItem("broteens.auth.session");
+              if (isMounted) setAuthStatus("guest");
+              return;
+            }
           }
         }
 
@@ -110,10 +123,24 @@ export function AuthShell({
           if (!isMounted) return;
 
           if (res.status === 401 || res.status === 403) {
-            // Token was revoked or expired on backend
-            localStorage.removeItem("broteens.auth.session");
-            setAuthStatus("guest");
-            return;
+            // Token expired or rejected: attempt silent refresh before clearing
+            if (parsed?.refreshToken) {
+              const refreshed = await performTokenRefresh(
+                authApiUrl,
+                parsed as AuthSession,
+              );
+              if (refreshed?.accessToken) {
+                token = refreshed.accessToken;
+              } else {
+                localStorage.removeItem("broteens.auth.session");
+                setAuthStatus("guest");
+                return;
+              }
+            } else {
+              localStorage.removeItem("broteens.auth.session");
+              setAuthStatus("guest");
+              return;
+            }
           }
         } catch {
           // If the backend is offline or network is degraded, proceed with local valid session
