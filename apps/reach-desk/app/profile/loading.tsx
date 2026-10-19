@@ -5,7 +5,7 @@ export default function SettingsLoading() {
     <Spinner
       fullScreen
       size="lg"
-      label="Loading workspace settings..."
+      label="Loading profile..."
       sublabel="Preparing your profile and preferences"
     />
   );

@@ -1,7 +1,7 @@
 /**
  * Application Routes Configuration
  *
- * Internal routes: Protected workspace/account routes (e.g. /settings)
+ * Internal routes: Protected workspace/account routes (e.g. /profile)
  * External routes: Public-facing marketing and authentication routes (e.g. /, /features, /login, /signup, /reset-password)
  */
 
@@ -14,7 +14,7 @@ export const ROUTES = {
   resetPassword: "/reset-password",
 
   // Internal (Workspace / Account)
-  settings: "/settings",
+  settings: "/profile",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
@@ -40,7 +40,7 @@ export type InternalRoute = (typeof INTERNAL_ROUTES)[number];
 export type ExternalRoute = (typeof EXTERNAL_ROUTES)[number];
 
 /**
- * Returns true if the given pathname is an internal route (e.g. /settings or /settings/*).
+ * Returns true if the given pathname is an internal route (e.g. /profile*).
  */
 export function isInternalRoute(pathname?: string | null): boolean {
   if (!pathname) return false;
@@ -61,7 +61,7 @@ export function isExternalRoute(pathname?: string | null): boolean {
 
 /**
  * Based on route classification:
- * Internal routes (e.g. /settings) remove/hide the footer.
+ * Internal routes (e.g. /profile) remove/hide the footer.
  * External routes keep the footer.
  */
 export function shouldShowFooter(pathname?: string | null): boolean {

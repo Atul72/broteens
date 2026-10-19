@@ -1,18 +1,52 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuthSession } from "@broteens/features";
+import { logout, useAuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LogOut, Wrench } from "lucide-react";
+
+const authApiUrl =
+  process.env.NEXT_PUBLIC_AUTH_API_URL ?? "http://localhost:4000/v1/auth";
+
+// Function to greet the user
+function getGreeting(fullName?: string | null, email?: string | null): string {
+  const hour = new Date().getHours();
+  let timeGreeting = "Good afternoon";
+  if (hour < 12) {
+    timeGreeting = "Good morning";
+  } else if (hour >= 17) {
+    timeGreeting = "Good evening";
+  }
+
+  const name =
+    fullName?.trim().split(" ")[0] || (email ? email.split("@")[0] : "there");
+
+  return `${timeGreeting}, ${name}`;
+}
+
+// function getRoleLabel(role?: string | null): string {
+//   if (!role) return "Workspace Member";
+//   const map: Record<string, string> = {
+//     superadmin: "Super Admin",
+//     admin: "Admin",
+//     moderator: "Manager",
+//     user: "Manager",
+//   };
+//   return (
+//     map[role.toLowerCase()] || role.charAt(0).toUpperCase() + role.slice(1)
+//   );
+// }
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { session } = useAuthSession();
+  const { session, clearSession } = useAuthSession();
   const pathname = usePathname();
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   const isFeaturesPage = pathname === "/features";
   const isHomePage = pathname === "/" || pathname === "";
@@ -29,6 +63,50 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setProfileMenuOpen(false);
+      }
+    }
+    if (profileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [profileMenuOpen]);
+
+  // Close profile dropdown on Escape key
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setProfileMenuOpen(false);
+      }
+    }
+    if (profileMenuOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [profileMenuOpen]);
+
+  const handleLogout = async () => {
+    setProfileMenuOpen(false);
+    if (session?.refreshToken) {
+      void logout(authApiUrl, session.refreshToken).catch(() => {});
+    }
+    clearSession();
+    window.location.assign("/login");
+  };
+
+  const isLoggedIn = mounted && !!session;
+
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
@@ -39,7 +117,7 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
+          {/* Brand Logo */}
           <Link
             href="/"
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender-500 rounded-lg"
@@ -47,88 +125,156 @@ export function Navbar() {
             <ReachdeskLogo iconClassName="w-8 h-8 text-lavender-600" />
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-            <Link
-              href="/"
-              className={`px-3.5 py-2 text-sm rounded-full transition-colors ${
-                isHomePage
-                  ? "font-semibold text-lavender-700 bg-lavender-50/80"
-                  : "font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/features"
-              className={`px-3.5 py-2 text-sm rounded-full transition-colors ${
-                isFeaturesPage
-                  ? "font-semibold text-lavender-700 bg-lavender-50/80"
-                  : "font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
-            >
-              Features
-            </Link>
-            <Link
-              href="/#pricing"
-              className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/#about"
-              className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
-            >
-              About
-            </Link>
-            <div className="relative group">
-              <button
-                type="button"
-                className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors inline-flex items-center gap-1"
-              >
-                Resources
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:rotate-180" />
-              </button>
-              {/* Dropdown Menu */}
-              <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-white shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all animate-in fade-in-50 zoom-in-95">
-                <Link
-                  href="/features#templates"
-                  className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
-                >
-                  Template Library
-                </Link>
-                <Link
-                  href="/features#channels"
-                  className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
-                >
-                  Campaign Guides
-                </Link>
-                <a
-                  href="#api"
-                  className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
-                >
-                  API &amp; Webhooks
-                </a>
-              </div>
-            </div>
-          </nav>
-
-          {/* Right Action Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            {mounted && session ? (
+          {/* Desktop Navigation Links: Completely removed when user is logged in */}
+          {!isLoggedIn && (
+            <nav className="hidden md:flex items-center gap-1 lg:gap-2">
               <Link
-                href="/settings"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-lavender-50 text-slate-800 transition-colors border border-slate-200"
+                href="/"
+                className={`px-3.5 py-2 text-sm rounded-full transition-colors ${
+                  isHomePage
+                    ? "font-semibold text-lavender-700 bg-lavender-50/80"
+                    : "font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                }`}
               >
-                <div className="w-8 h-8 rounded-full bg-lavender-600 text-white font-bold text-xs grid place-items-center uppercase shadow-sm">
-                  {session.user.fullName
-                    ? session.user.fullName.slice(0, 2)
-                    : session.user.email.slice(0, 2)}
-                </div>
-                <span className="text-sm font-semibold text-slate-800 max-w-[120px] truncate">
-                  {session.user.fullName || "Settings"}
-                </span>
+                Home
               </Link>
+              <Link
+                href="/features"
+                className={`px-3.5 py-2 text-sm rounded-full transition-colors ${
+                  isFeaturesPage
+                    ? "font-semibold text-lavender-700 bg-lavender-50/80"
+                    : "font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                Features
+              </Link>
+              <Link
+                href="/#pricing"
+                className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/#about"
+                className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
+              >
+                About
+              </Link>
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors inline-flex items-center gap-1"
+                >
+                  Resources
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:rotate-180" />
+                </button>
+                {/* Dropdown Menu */}
+                <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-white shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all animate-in fade-in-50 zoom-in-95">
+                  <Link
+                    href="/features#templates"
+                    className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
+                  >
+                    Template Library
+                  </Link>
+                  <Link
+                    href="/features#channels"
+                    className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
+                  >
+                    Campaign Guides
+                  </Link>
+                  <a
+                    href="#api"
+                    className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
+                  >
+                    API &amp; Webhooks
+                  </a>
+                </div>
+              </div>
+            </nav>
+          )}
+
+          {/* Right Action: Profile dropdown when logged in, or Auth buttons when guest */}
+          <div className="hidden md:flex items-center gap-3">
+            {isLoggedIn ? (
+              <div className="relative" ref={profileDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  className={`inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full text-slate-800 transition-all border ${
+                    profileMenuOpen
+                      ? "bg-lavender-50/90 border-lavender-300 shadow-sm ring-2 ring-lavender-400/20"
+                      : "hover:bg-lavender-50/80 border-slate-200/90"
+                  } focus:outline-none`}
+                  aria-expanded={profileMenuOpen}
+                  aria-haspopup="true"
+                  aria-label="Open user profile menu"
+                >
+                  <div className="w-8 h-8 rounded-full bg-lavender-600 text-white font-bold text-xs grid place-items-center uppercase shadow-sm shrink-0">
+                    {session.user.fullName
+                      ? session.user.fullName.slice(0, 2)
+                      : session.user.email.slice(0, 2)}
+                  </div>
+                  <span className="text-sm font-semibold text-slate-800 max-w-[130px] truncate">
+                    {session.user.fullName || session.user.email.split("@")[0]}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                      profileMenuOpen ? "rotate-180 text-lavender-600" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Floating Profile Dropdown Card */}
+                {profileMenuOpen && (
+                  <div
+                    role="menu"
+                    aria-orientation="vertical"
+                    className="absolute right-0 top-full mt-2.5 w-64 rounded-2xl bg-white border border-slate-100 p-4 shadow-xl shadow-slate-900/10 animate-in fade-in-50 zoom-in-95 z-50 text-left"
+                  >
+                    {/* Header: Greeting & Role */}
+                    <div className="px-1 pt-0.5">
+                      <h4 className="text-[15px] font-bold text-slate-900 tracking-tight leading-snug">
+                        {getGreeting(session.user.fullName, session.user.email)}
+                      </h4>
+                      {/* <p className="text-xs text-slate-400 font-normal mt-0.5">
+                        {getRoleLabel(session.user.role)}
+                      </p> */}
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-slate-100 my-3" />
+
+                    {/* Options */}
+                    <div className="flex flex-col gap-1.5">
+                      {/* Option 1: Profile settings */}
+                      <Link
+                        href="/profile"
+                        onClick={() => setProfileMenuOpen(false)}
+                        role="menuitem"
+                        className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#F4EEFB] hover:bg-lavender-100 text-lavender-900 font-medium text-sm transition-colors group"
+                      >
+                        <Wrench className="w-4 h-4 text-lavender-600 shrink-0 group-hover:rotate-12 transition-transform" />
+                        <span className="text-sm font-medium text-lavender-950">
+                          Profile settings
+                        </span>
+                      </Link>
+
+                      {/* Option 2: Log Out */}
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        role="menuitem"
+                        className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-rose-50 text-rose-500 font-medium text-sm transition-colors group w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4 text-rose-500 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
+                        <span className="text-sm font-medium text-rose-500">
+                          Log Out
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
@@ -147,7 +293,7 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Animated Mobile Menu Button (Hamburger to X) */}
+          {/* Animated Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -184,7 +330,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Smooth Animated Mobile Menu Accordion Drawer */}
+      {/* Mobile Menu Accordion Drawer */}
       <div
         className={`grid md:hidden transition-all duration-300 ease-in-out overflow-hidden border-slate-200 bg-white ${
           mobileMenuOpen
@@ -200,64 +346,96 @@ export function Navbar() {
                 : "-translate-y-3 opacity-0"
             }`}
           >
-            <nav className="flex flex-col space-y-1">
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3.5 py-2.5 rounded-xl text-base transition-colors ${
-                  isHomePage
-                    ? "font-semibold text-lavender-700 bg-lavender-50"
-                    : "font-medium text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/features"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-3.5 py-2.5 rounded-xl text-base transition-colors ${
-                  isFeaturesPage
-                    ? "font-semibold text-lavender-700 bg-lavender-50"
-                    : "font-medium text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                Features
-              </Link>
-              <Link
-                href="/#pricing"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-              >
-                Pricing
-              </Link>
-              <Link
-                href="/#about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-              >
-                About
-              </Link>
-              <a
-                href="#resources"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-              >
-                Resources
-              </a>
-            </nav>
+            {isLoggedIn ? (
+              <div className="py-2 space-y-3">
+                {/* Greeting & Role in Mobile Drawer */}
+                <div className="px-1 pt-1">
+                  <h4 className="text-base font-bold text-slate-900 tracking-tight leading-snug">
+                    {getGreeting(session.user.fullName, session.user.email)}
+                  </h4>
+                  {/* <p className="text-xs text-slate-400 font-normal mt-0.5">
+                    {getRoleLabel(session.user.role)}
+                  </p> */}
+                </div>
 
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
-              {mounted && session ? (
-                <Link
-                  href="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 text-sm font-semibold text-lavender-700 bg-lavender-50 hover:bg-lavender-100 rounded-xl border border-lavender-200 transition-colors"
-                >
-                  Workspace Settings (
-                  {session.user.fullName || session.user.email})
-                </Link>
-              ) : (
-                <>
+                <div className="h-px bg-slate-100 my-2" />
+
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#F4EEFB] hover:bg-lavender-100 text-lavender-900 font-medium text-sm transition-colors"
+                  >
+                    <Wrench className="w-4 h-4 text-lavender-600 shrink-0" />
+                    <span className="text-sm font-medium text-lavender-950">
+                      Profile settings
+                    </span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      void handleLogout();
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-50 text-rose-500 font-medium text-sm transition-colors text-left w-full"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-500 shrink-0" />
+                    <span className="text-sm font-medium text-rose-500">
+                      Log Out
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <nav className="flex flex-col space-y-1">
+                  <Link
+                    href="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3.5 py-2.5 rounded-xl text-base transition-colors ${
+                      isHomePage
+                        ? "font-semibold text-lavender-700 bg-lavender-50"
+                        : "font-medium text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/features"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-3.5 py-2.5 rounded-xl text-base transition-colors ${
+                      isFeaturesPage
+                        ? "font-semibold text-lavender-700 bg-lavender-50"
+                        : "font-medium text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    href="/#pricing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                  <Link
+                    href="/#about"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    About
+                  </Link>
+                  <a
+                    href="#resources"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3.5 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    Resources
+                  </a>
+                </nav>
+
+                <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
@@ -272,9 +450,9 @@ export function Navbar() {
                   >
                     Get Started Free
                   </Link>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
