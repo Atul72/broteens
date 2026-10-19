@@ -51,10 +51,10 @@ broteens/
   - **Tab Visibility & Wake Listener**: Detects laptop wake and tab refocus, verifying token freshness before any user action occurs.
 - **Zero-Flash Route Protection (`AuthShell`)**:
   - Guest-only routes (`/login`, `/signup`, `/reset-password`) start in a `"checking"` state and render a custom `Spinner` fallback on initial paint.
-  - If an authenticated session is detected, the user is immediately redirected to `/settings` with zero flash of login/signup forms.
+  - If an authenticated session is detected, the user is immediately redirected to `/profile` with zero flash of login/signup forms.
 - **Structured Route Separation**:
   - Organized in `apps/reach-desk/libs/routes.ts`.
-  - **Internal routes** (`/settings`): Workspace routes where the public marketing footer is automatically omitted.
+  - **Internal routes** (`/profile`): Workspace routes where the public marketing footer is automatically omitted.
   - **External routes** (`/`, `/features`, `/login`, `/signup`, `/reset-password`): Public marketing pages that include the full footer.
 - **Google OAuth & Password Recovery**:
   - Meta and Google OAuth buttons styled to container width.

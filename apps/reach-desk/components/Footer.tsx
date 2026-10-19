@@ -8,8 +8,6 @@ import { shouldShowFooter } from "@/libs/routes";
 
 export function Footer() {
   const pathname = usePathname();
-
-  // Based on route configuration, internal routes (e.g. /settings) hide the footer
   if (!shouldShowFooter(pathname)) {
     return null;
   }

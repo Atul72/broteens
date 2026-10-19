@@ -18,7 +18,7 @@ A modern Next.js 14 application providing a unified marketing workspace for mana
   - Prevents guest-only routes (`/login`, `/signup`, `/reset-password`) from flashing forms to authenticated users.
   - Initial SSR & client hydration renders a centered `Spinner` fallback while validating local/backend session state.
 - **Route Architecture (`libs/routes.ts`)**:
-  - **Internal Routes**: `/settings` (protected workspace view; marketing footer is automatically omitted).
+  - **Internal Routes**: `/profile` (protected workspace view; marketing footer is automatically omitted).
   - **External Routes**: `/`, `/features`, `/login`, `/signup`, `/reset-password` (marketing pages; full footer enabled).
 - **Google Single-Sign-On**:
   - Meta and Google OAuth buttons styled to match container width.

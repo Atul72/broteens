@@ -147,7 +147,7 @@ export function AuthShell({
         }
 
         if (isMounted) {
-          window.location.replace("/settings");
+          window.location.replace("/profile");
         }
       } catch {
         if (isMounted) setAuthStatus("guest");

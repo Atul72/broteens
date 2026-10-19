@@ -40,7 +40,7 @@ export default function LoginPage() {
         <LoginForm
           apiBaseUrl={authApiUrl}
           googleClientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-          redirectTo="/settings"
+          redirectTo="/profile"
           signupHref="/signup"
         />
       </AuthShell>

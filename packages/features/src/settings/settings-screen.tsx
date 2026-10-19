@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Button } from "@repo/ui";
-
-import { logout, updateProfile } from "../authentication/api";
+import { updateProfile } from "../authentication/api";
 import { useAuthSession } from "../authentication/use-auth-session";
 import {
   ProfileSettingsForm,
@@ -46,27 +44,10 @@ export function SettingsScreen({ apiBaseUrl }: { apiBaseUrl: string }) {
       <div className="mx-auto max-w-5xl">
         <header className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
-              Account settings
-            </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              Your profile
+              Profile Settings
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
-              Keep your account details accurate and up to date.
-            </p>
           </div>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              void logout(apiBaseUrl, session.refreshToken).finally(() => {
-                clearSession();
-                window.location.assign("/login");
-              });
-            }}
-          >
-            Sign out
-          </Button>
         </header>
 
         <ProfileSettingsForm
