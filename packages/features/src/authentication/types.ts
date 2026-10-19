@@ -8,12 +8,15 @@ export interface AuthUser {
   createdAt: string;
 }
 
-export interface AuthSession {
+export interface TokenPair {
   accessToken: string;
   refreshToken: string;
   tokenType: "Bearer";
   accessTokenExpiresAt: string;
   refreshTokenExpiresAt: string;
+}
+
+export interface AuthSession extends TokenPair {
   user: AuthUser;
 }
 

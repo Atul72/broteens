@@ -5,6 +5,7 @@ export * from "./authentication/google-auth-button";
 export * from "./authentication/login-form";
 export * from "./authentication/reset-password-form";
 export * from "./authentication/signup-form";
+export * from "./authentication/token-refresh";
 export * from "./authentication/types";
 export * from "./authentication/use-auth-session";
 export * from "./settings/profile-settings-form";
