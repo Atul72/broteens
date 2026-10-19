@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reachdesk Frontend
 
-## Getting Started
+A modern Next.js 14 application providing a unified marketing workspace for managing verified **Email** and **WhatsApp** campaigns.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- **Brand Design System**:
+  - Signature lavender color palette (`#8646D8` accent, `#FAF7FD` canvas, `#2B0E4E` gradient).
+  - Responsive showcase layouts that adapt across desktop, tablet, and mobile.
+  - Custom branded 404 page with 3D illustration and interactive navigation.
+- **Automated Silent Auth Refresh**:
+  - **Proactive Background Refresh**: Silently requests a new JWT access token 60 seconds before expiration via `/v1/auth/refresh`.
+  - **Reactive 401 Interceptor**: Intercepts expired token errors on authenticated requests, refreshes using the 30-day `refreshToken`, and replays the request without user interruption.
+  - **Tab Visibility Sync**: Refreshes sessions immediately when users wake their devices or switch back to the browser tab.
+- **Zero-Flash Route Protection (`AuthShell`)**:
+  - Prevents guest-only routes (`/login`, `/signup`, `/reset-password`) from flashing forms to authenticated users.
+  - Initial SSR & client hydration renders a centered `Spinner` fallback while validating local/backend session state.
+- **Route Architecture (`libs/routes.ts`)**:
+  - **Internal Routes**: `/settings` (protected workspace view; marketing footer is automatically omitted).
+  - **External Routes**: `/`, `/features`, `/login`, `/signup`, `/reset-password` (marketing pages; full footer enabled).
+- **Google Single-Sign-On**:
+  - Meta and Google OAuth buttons styled to match container width.
+
+---
+
+## Directory Structure
+
+```text
+apps/reach-desk/
+├── app/
+│   ├── (marketing)/
+│   │   ├── page.tsx            # Home landing page with Hero, Features, CTA
+│   │   └── features/page.tsx   # Detailed features & channel workflow showcase
+│   ├── login/page.tsx          # Sign-in page wrapped in AuthShell & Suspense
+│   ├── signup/page.tsx         # Account registration page wrapped in AuthShell & Suspense
+│   ├── reset-password/page.tsx # Password recovery form wrapped in AuthShell & Suspense
+│   ├── settings/page.tsx       # Profile & account settings screen
+│   ├── not-found.tsx           # Custom 404 error page
+│   ├── loading.tsx             # Root Suspense streaming fallback with Spinner
+│   └── layout.tsx              # Root HTML & Geist font configuration
+├── components/
+│   ├── AuthShell.tsx           # Shared authentication shell with guest-only protection
+│   ├── Spinner.tsx             # Lavender dual-track circular spinner with fullScreen option
+│   ├── Navbar.tsx              # Sticky header with authenticated user menu & mobile drawer
+│   ├── Footer.tsx              # Marketing footer with route-based visibility check
+│   └── ReachdeskLogo.tsx       # Branded SVG logo icon and typography
+└── libs/
+    └── routes.ts               # Internal/external route lists and shouldShowFooter helper
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` based on `.env.example`:
 
-## Learn More
+```bash
+NEXT_PUBLIC_AUTH_API_URL=http://localhost:4000/v1/auth
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run development server:
 
-## Deploy on Vercel
+```bash
+pnpm dev
+# or from root
+pnpm --filter reach-desk dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000) (or `http://localhost:3001` if 3000 is occupied).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Build & Type Check
+
+```bash
+# Verify TypeScript types and generate production Next.js build
+pnpm build
+```
