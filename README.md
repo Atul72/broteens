@@ -64,7 +64,7 @@ broteens/
 
 ## Web Crawler & Extractor Pipeline
 
-The **Crawler Pipeline** (`packages/crawler`, `packages/extractor`, `apps/api`) is an asynchronous, API-first system designed to recursively follow links on a website, extract article content, and persist clean Markdown and link graphs.
+The **Crawler Pipeline** (`packages/crawler`, `packages/extractor`, `apps/auth-api`) is an asynchronous, API-first system designed to recursively follow links on a website, extract article content, and persist clean Markdown and link graphs.
 
 ### Request Lifecycle
 
@@ -165,7 +165,7 @@ Copy sample environment files:
 
 ```bash
 cp .env.example .env
-cp apps/api/.env.example apps/api/.env
+cp apps/auth-api/.env.example apps/auth-api/.env
 cp apps/reach-desk/.env.example apps/reach-desk/.env.local
 ```
 

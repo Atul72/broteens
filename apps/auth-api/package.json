@@ -1,5 +1,5 @@
 {
-  "name": "@broteens/api",
+  "name": "@broteens/auth-api",
   "private": true,
   "type": "module",
   "exports": "./src/app.ts",

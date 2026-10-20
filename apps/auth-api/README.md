@@ -1,11 +1,11 @@
-# Broteens API
+# Broteens Auth API
 
 Express API host for the workspace backend packages.
 
 ```bash
 docker compose up -d
 pnpm --filter @broteens/database db:push
-pnpm --filter @broteens/api dev
+pnpm --filter @broteens/auth-api dev
 ```
 
 The server listens on `http://localhost:4000`. Auth routes are mounted at
