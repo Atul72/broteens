@@ -22,6 +22,8 @@ export const userRoleEnum = pgEnum("user_role", [
   "moderator",
 ]);
 
+export const userTypeEnum = pgEnum("user_type", ["internal", "external"]);
+
 export const userStatusEnum = pgEnum("user_status", [
   "active",
   "inactive",
@@ -60,6 +62,7 @@ export const users = pgTable(
     fullName: varchar("full_name", { length: 200 }).notNull(),
     avatarUrl: text("avatar_url"),
     role: userRoleEnum("role").notNull().default("user"),
+    userType: userTypeEnum("user_type").notNull().default("external"),
     status: userStatusEnum("status").notNull().default("active"),
     emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })

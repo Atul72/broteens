@@ -70,6 +70,7 @@ function publicUser(user: User): PublicUser {
     fullName: user.fullName,
     avatarUrl: user.avatarUrl,
     role: user.role,
+    userType: user.userType,
     emailVerified: user.emailVerifiedAt !== null,
     createdAt: user.createdAt,
   };
@@ -179,6 +180,7 @@ export class AuthService {
             email: input.email,
             fullName: input.fullName,
             passwordHash,
+            userType: input.userType ?? "external",
           })
           .returning();
         if (!user)
@@ -293,6 +295,7 @@ export class AuthService {
             email,
             fullName: payload.name?.trim() || email.split("@")[0] || "User",
             avatarUrl: payload.picture,
+            userType: "external",
             emailVerifiedAt: new Date(),
           })
           .onConflictDoNothing({ target: users.email })

@@ -13,12 +13,16 @@ const password = z
   .regex(/[A-Z]/, "Password must contain an uppercase letter")
   .regex(/[0-9]/, "Password must contain a number");
 
+export const userTypeEnumSchema = z.enum(["internal", "external"]);
+export type UserType = z.infer<typeof userTypeEnumSchema>;
+
 export const signUpSchema = z
   .strictObject({
     email,
     password,
     confirmPassword: z.string(),
     fullName: z.string().trim().min(2).max(200),
+    userType: userTypeEnumSchema.default("external"),
   })
   .refine((input) => input.password === input.confirmPassword, {
     message: "Passwords do not match",

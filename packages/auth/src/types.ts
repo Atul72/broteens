@@ -11,6 +11,7 @@ export interface PublicUser {
   fullName: string;
   avatarUrl: string | null;
   role: User["role"];
+  userType: User["userType"];
   emailVerified: boolean;
   createdAt: Date;
 }
