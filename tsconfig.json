@@ -17,6 +17,7 @@
       "@broteens/extractor": ["./packages/extractor/src/index.ts"],
       "@broteens/queue": ["./packages/queue/src/index.ts"],
       "@broteens/database": ["./packages/database/src/index.ts"],
+      "@broteens/database/*": ["./packages/database/src/*"],
       "@broteens/core": ["./packages/crawler/src/index.ts"],
       "@broteens/auth": ["./packages/auth/src/index.ts"],
       "@broteens/errors": ["./packages/errors/src/index.ts"],

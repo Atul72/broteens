@@ -4,6 +4,7 @@ export interface AuthUser {
   fullName: string;
   avatarUrl: string | null;
   role: "superadmin" | "admin" | "user" | "moderator";
+  userType: "internal" | "external";
   emailVerified: boolean;
   createdAt: string;
 }
@@ -28,4 +29,5 @@ export interface LoginValues {
 export interface SignupValues extends LoginValues {
   confirmPassword: string;
   fullName: string;
+  userType?: "internal" | "external";
 }

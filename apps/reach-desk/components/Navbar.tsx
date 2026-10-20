@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { logout, useAuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
@@ -26,6 +27,71 @@ function getGreeting(fullName?: string | null, email?: string | null): string {
   return `${timeGreeting}, ${name}`;
 }
 
+function getInitials(fullName?: string | null, email?: string | null): string {
+  if (fullName && fullName.trim()) {
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length >= 2 && parts[0] && parts[parts.length - 1]) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return fullName.trim().slice(0, 2).toUpperCase();
+  }
+  if (email && email.trim()) {
+    return email.trim().slice(0, 2).toUpperCase();
+  }
+  return "U";
+}
+
+function UserAvatar({
+  avatarUrl,
+  fullName,
+  email,
+  size = "md",
+  className = "",
+}: {
+  avatarUrl?: string | null;
+  fullName?: string | null;
+  email?: string | null;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) {
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [avatarUrl]);
+
+  const config = {
+    sm: { sizeClasses: "w-7 h-7 text-[11px]", px: 28 },
+    md: { sizeClasses: "w-8 h-8 text-xs", px: 32 },
+    lg: { sizeClasses: "w-10 h-10 text-sm", px: 40 },
+  }[size];
+
+  const trimmedUrl = avatarUrl?.trim();
+
+  if (trimmedUrl && !imageError) {
+    return (
+      <Image
+        src={trimmedUrl}
+        alt={fullName || "User avatar"}
+        width={config.px}
+        height={config.px}
+        unoptimized
+        referrerPolicy="no-referrer"
+        onError={() => setImageError(true)}
+        className={`${config.sizeClasses} rounded-full object-cover shadow-sm shrink-0 ring-1 ring-lavender-200/60 ${className}`}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`${config.sizeClasses} rounded-full bg-lavender-600 text-white font-bold grid place-items-center uppercase shadow-sm shrink-0 ${className}`}
+    >
+      {getInitials(fullName, email)}
+    </div>
+  );
+}
+
 // function getRoleLabel(role?: string | null): string {
 //   if (!role) return "Workspace Member";
 //   const map: Record<string, string> = {
@@ -44,7 +110,7 @@ export function Navbar() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { session, clearSession } = useAuthSession();
+  const { session, clearSession, setSession } = useAuthSession();
   const pathname = usePathname();
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +120,56 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+
+  // Background sync latest user profile from /v1/auth/me to ensure avatarUrl is always fresh
+  useEffect(() => {
+    const token = session?.accessToken;
+    if (!token) return;
+
+    let isMounted = true;
+    const fetchLatestProfile = async () => {
+      try {
+        const response = await fetch(`${authApiUrl}/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          user?: { avatarUrl?: string | null; fullName?: string };
+        };
+        const latestUser = data?.user;
+        const currentSession = sessionRef.current;
+        if (
+          isMounted &&
+          currentSession &&
+          latestUser &&
+          (latestUser.avatarUrl !== currentSession.user.avatarUrl ||
+            (latestUser.fullName &&
+              latestUser.fullName !== currentSession.user.fullName))
+        ) {
+          setSession({
+            ...currentSession,
+            user: {
+              ...currentSession.user,
+              ...latestUser,
+            },
+          });
+        }
+      } catch {
+        // Silent catch
+      }
+    };
+
+    void fetchLatestProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [session?.accessToken, setSession]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +222,10 @@ export function Navbar() {
   };
 
   const isLoggedIn = mounted && !!session;
+  const effectiveAvatarUrl =
+    session?.user?.avatarUrl ||
+    (session?.user as { avatar_url?: string | null } | undefined)?.avatar_url ||
+    null;
 
   return (
     <header
@@ -209,11 +329,12 @@ export function Navbar() {
                   aria-haspopup="true"
                   aria-label="Open user profile menu"
                 >
-                  <div className="w-8 h-8 rounded-full bg-lavender-600 text-white font-bold text-xs grid place-items-center uppercase shadow-sm shrink-0">
-                    {session.user.fullName
-                      ? session.user.fullName.slice(0, 2)
-                      : session.user.email.slice(0, 2)}
-                  </div>
+                  <UserAvatar
+                    avatarUrl={effectiveAvatarUrl}
+                    fullName={session.user.fullName}
+                    email={session.user.email}
+                    size="md"
+                  />
                   <span className="text-sm font-semibold text-slate-800 max-w-[130px] truncate">
                     {session.user.fullName || session.user.email.split("@")[0]}
                   </span>
@@ -348,14 +469,22 @@ export function Navbar() {
           >
             {isLoggedIn ? (
               <div className="py-2 space-y-3">
-                {/* Greeting & Role in Mobile Drawer */}
-                <div className="px-1 pt-1">
-                  <h4 className="text-base font-bold text-slate-900 tracking-tight leading-snug">
-                    {getGreeting(session.user.fullName, session.user.email)}
-                  </h4>
-                  {/* <p className="text-xs text-slate-400 font-normal mt-0.5">
-                    {getRoleLabel(session.user.role)}
-                  </p> */}
+                {/* Greeting & Avatar in Mobile Drawer */}
+                <div className="flex items-center gap-3 px-1 pt-1">
+                  <UserAvatar
+                    avatarUrl={effectiveAvatarUrl}
+                    fullName={session.user.fullName}
+                    email={session.user.email}
+                    size="lg"
+                  />
+                  <div className="min-w-0">
+                    <h4 className="text-base font-bold text-slate-900 tracking-tight leading-snug truncate">
+                      {getGreeting(session.user.fullName, session.user.email)}
+                    </h4>
+                    <p className="text-xs text-slate-400 font-normal mt-0.5 truncate">
+                      {session.user.email}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="h-px bg-slate-100 my-2" />
