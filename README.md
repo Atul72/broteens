@@ -15,8 +15,8 @@ This workspace houses two core capabilities:
 broteens/
 ├── apps/
 │   ├── reach-desk/         # Next.js 14 marketing & workspace app (Email/WhatsApp campaigns)
-│   ├── api/                # Express backend: Auth (JWT/Refresh, Google OAuth) & Crawl routes
-│   └── ecommerce-alert/    # Next.js e-commerce tracking & price alert interface
+│   ├── reach-desk-backend/ # Express backend for Reachdesk templates & modules
+│   └── auth-api/           # Express backend: Auth (JWT/Refresh, Google OAuth) & Crawl routes
 │
 ├── packages/
 │   ├── auth/               # Auth service, token rotation (JWT 15m / Refresh 30d), Bcrypt
@@ -199,11 +199,11 @@ Or run individual apps:
 # Reachdesk Next.js frontend (http://localhost:3000)
 pnpm --filter reach-desk dev
 
-# Backend API (http://localhost:4000)
-pnpm --filter api dev
+# Auth API (http://localhost:4000)
+pnpm --filter @broteens/auth-api dev
 
-# E-commerce Alert app (http://localhost:3002)
-pnpm --filter ecommerce-alert dev
+# Reachdesk Backend (http://localhost:5000)
+pnpm --filter @broteens/reach-desk-backend dev
 ```
 
 ---
