@@ -14,9 +14,10 @@ This workspace houses two core capabilities:
 ```text
 broteens/
 ├── apps/
-│   ├── reach-desk/         # Next.js 14 marketing & workspace app (Email/WhatsApp campaigns)
-│   ├── reach-desk-backend/ # Express backend for Reachdesk templates & modules
-│   └── auth-api/           # Express backend: Auth (JWT/Refresh, Google OAuth) & Crawl routes
+│   ├── reach-desk-external/ # Next.js 14 public marketing & authentication app (Port 3000)
+│   ├── reach-desk-internal/ # Next.js 14 authenticated workspace app (Templates, Editor, Profile) (Port 3001)
+│   ├── reach-desk-backend/  # Express backend for Reachdesk templates & modules (Port 5000)
+│   └── auth-api/            # Express backend: Auth (JWT/Refresh, Google OAuth) & Crawl routes (Port 4000)
 │
 ├── packages/
 │   ├── auth/               # Auth service, token rotation (JWT 15m / Refresh 30d), Bcrypt
@@ -196,8 +197,11 @@ pnpm dev
 Or run individual apps:
 
 ```bash
-# Reachdesk Next.js frontend (http://localhost:3000)
-pnpm --filter reach-desk dev
+# Reachdesk External Public App (http://localhost:3000)
+pnpm --filter reach-desk-external dev
+
+# Reachdesk Internal Workspace App (http://localhost:3001)
+pnpm --filter reach-desk-internal dev
 
 # Auth API (http://localhost:4000)
 pnpm --filter @broteens/auth-api dev
