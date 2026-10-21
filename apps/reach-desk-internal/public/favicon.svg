@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="topWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C084FC" />
+      <stop offset="100%" stop-color="#9333EA" />
+    </linearGradient>
+    <linearGradient id="bottomWing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333EA" />
+      <stop offset="100%" stop-color="#7E22CE" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main top wing -->
+  <path
+    d="M3.5 15.5L28.5 4.5L17.5 19L3.5 15.5Z"
+    fill="url(#topWing)"
+  />
+
+  <!-- Main bottom wing -->
+  <path
+    d="M17.5 19L28.5 4.5L14.5 28L12.5 20.5L17.5 19Z"
+    fill="url(#bottomWing)"
+  />
+
+  <!-- Center crease fold -->
+  <path
+    d="M12.5 20.5L17.5 19L14.5 28L12.5 20.5Z"
+    fill="#581C87"
+  />
+
+  <!-- Crisp fold highlight line -->
+  <path
+    d="M17.5 19L28.5 4.5"
+    stroke="#F3E8FF"
+    stroke-width="0.8"
+    stroke-linecap="round"
+  />
+</svg>
