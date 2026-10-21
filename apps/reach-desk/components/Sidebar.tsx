@@ -8,10 +8,6 @@ import { logout, useAuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
 import {
   LayoutTemplate,
-  Package,
-  Layers,
-  BarChart3,
-  CreditCard,
   Settings,
   LogOut,
   X,
@@ -49,8 +45,6 @@ interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  badge?: string;
-  isExternalLink?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -58,27 +52,6 @@ const NAV_ITEMS: NavItem[] = [
     name: "Templates",
     href: "/templates",
     icon: LayoutTemplate,
-    badge: "Active",
-  },
-  {
-    name: "Orders",
-    href: "/orders",
-    icon: Package,
-  },
-  {
-    name: "Stock Count",
-    href: "/stock",
-    icon: Layers,
-  },
-  {
-    name: "Reports",
-    href: "/reports",
-    icon: BarChart3,
-  },
-  {
-    name: "Rates",
-    href: "/rates",
-    icon: CreditCard,
   },
 ];
 
@@ -154,40 +127,22 @@ export function Sidebar({
               if (isMobileMode) onClose();
             }}
             title={isCollapsed && !isMobileMode ? item.name : undefined}
-            className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${
               isActive
-                ? "bg-lavender-50 text-lavender-800 font-semibold ring-1 ring-lavender-200/80 shadow-xs"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                ? "bg-lavender-50 text-lavender-700 font-semibold"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium"
             } ${isCollapsed && !isMobileMode ? "justify-center px-2" : ""}`}
           >
             <Icon
-              className={`w-5 h-5 shrink-0 transition-transform ${
+              className={`w-5 h-5 shrink-0 transition-colors ${
                 isActive
-                  ? "text-lavender-600 scale-105"
-                  : "text-slate-500 group-hover:text-slate-800 group-hover:scale-105"
+                  ? "text-lavender-600"
+                  : "text-slate-500 group-hover:text-slate-800"
               }`}
             />
 
             {(!isCollapsed || isMobileMode) && (
-              <div className="flex-1 flex items-center justify-between min-w-0">
-                <span className="truncate">{item.name}</span>
-                {item.badge && (
-                  <span
-                    className={`ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      isActive
-                        ? "bg-lavender-600 text-white"
-                        : "bg-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Active edge indicator */}
-            {isActive && (
-              <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-lavender-600 rounded-l-full" />
+              <span className="truncate">{item.name}</span>
             )}
           </Link>
         );
@@ -203,16 +158,16 @@ export function Sidebar({
           if (isMobileMode) onClose();
         }}
         title={isCollapsed && !isMobileMode ? "Settings" : undefined}
-        className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+        className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors ${
           pathname === "/profile"
-            ? "bg-lavender-50 text-lavender-800 font-semibold ring-1 ring-lavender-200/80 shadow-xs"
-            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+            ? "bg-lavender-50 text-lavender-700 font-semibold"
+            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium"
         } ${isCollapsed && !isMobileMode ? "justify-center px-2" : ""}`}
       >
         <Settings
-          className={`w-5 h-5 shrink-0 transition-transform ${
+          className={`w-5 h-5 shrink-0 transition-colors ${
             pathname === "/profile"
-              ? "text-lavender-600 scale-105"
+              ? "text-lavender-600"
               : "text-slate-500 group-hover:text-slate-800 group-hover:rotate-45"
           }`}
         />
