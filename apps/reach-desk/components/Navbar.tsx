@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { logout, useAuthSession } from "@broteens/features";
 import { ReachdeskLogo } from "./ReachdeskLogo";
-import { ChevronDown, LogOut, Wrench } from "lucide-react";
+import { ChevronDown, LayoutTemplate, LogOut, Wrench } from "lucide-react";
 
 const authApiUrl =
   process.env.NEXT_PUBLIC_AUTH_API_URL ?? "http://localhost:4000/v1/auth";
@@ -367,7 +367,18 @@ export function Navbar() {
 
                     {/* Options */}
                     <div className="flex flex-col gap-1.5">
-                      {/* Option 1: Profile settings */}
+                      {/* Option 1: Templates */}
+                      <Link
+                        href="/templates"
+                        onClick={() => setProfileMenuOpen(false)}
+                        role="menuitem"
+                        className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-lavender-50 text-slate-700 hover:text-lavender-900 font-medium text-sm transition-colors group"
+                      >
+                        <LayoutTemplate className="w-4 h-4 text-lavender-600 shrink-0 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium">Templates</span>
+                      </Link>
+
+                      {/* Option 2: Profile settings */}
                       <Link
                         href="/profile"
                         onClick={() => setProfileMenuOpen(false)}
@@ -380,7 +391,7 @@ export function Navbar() {
                         </span>
                       </Link>
 
-                      {/* Option 2: Log Out */}
+                      {/* Option 3: Log Out */}
                       <button
                         type="button"
                         onClick={handleLogout}

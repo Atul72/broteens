@@ -41,7 +41,7 @@ export default function SignupPage() {
         <SignupForm
           apiBaseUrl={authApiUrl}
           googleClientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-          redirectTo="/profile"
+          redirectTo="/templates"
           loginHref="/login"
         />
       </AuthShell>
