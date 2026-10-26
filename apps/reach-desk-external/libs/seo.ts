@@ -1,3 +1,5 @@
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
 export const siteConfig = {
   name: "Reachdesk",
   shortName: "Reachdesk",
@@ -5,7 +7,7 @@ export const siteConfig = {
   titleTemplate: "%s | Reachdesk",
   description:
     "Turn contacts into customers. Reachdesk helps businesses create, send, and automate high-converting email and verified WhatsApp campaigns from one powerful workspace.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://reachdesk.broteens.com",
+  url: siteUrl,
   ogImage: "/opengraph-image",
   keywords: [
     "WhatsApp Marketing",
@@ -25,7 +27,7 @@ export const siteConfig = {
   ],
   author: {
     name: "Reachdesk Team",
-    url: "https://reachdesk.broteens.com",
+    url: siteUrl,
   },
   links: {
     twitter: "https://twitter.com/reachdesk",
