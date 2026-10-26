@@ -5,9 +5,12 @@ import { Spinner } from "@/components/Spinner";
 import { ExternalLoginForm } from "./_components/ExternalLoginForm";
 
 export const metadata: Metadata = {
-  title: "Sign in - Reachdesk",
+  title: "Sign In to Your Workspace",
   description:
-    "Sign in to your Reachdesk workspace to manage email and WhatsApp campaigns.",
+    "Sign in to your Reachdesk workspace to manage email and WhatsApp marketing campaigns.",
+  alternates: {
+    canonical: "/login",
+  },
 };
 
 const authApiUrl =

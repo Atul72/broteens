@@ -5,9 +5,12 @@ import { Spinner } from "@/components/Spinner";
 import { ExternalSignupForm } from "./_components/ExternalSignupForm";
 
 export const metadata: Metadata = {
-  title: "Create Account - Reachdesk",
+  title: "Create Free Account - Get Started",
   description:
-    "Create your Reachdesk account to send email and WhatsApp campaigns with ease.",
+    "Create your Reachdesk account to send verified WhatsApp messages and broadcast email campaigns with ease.",
+  alternates: {
+    canonical: "/signup",
+  },
 };
 
 const authApiUrl =
