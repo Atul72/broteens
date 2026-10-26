@@ -1,4 +1,5 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://broteens.vercel.app";
 
 export const siteConfig = {
   name: "Reachdesk",
