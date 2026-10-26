@@ -270,7 +270,7 @@ export function Navbar() {
               >
                 Features
               </Link>
-              <Link
+              {/* <Link
                 href="/#pricing"
                 className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
               >
@@ -281,17 +281,17 @@ export function Navbar() {
                 className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors"
               >
                 About
-              </Link>
+              </Link> */}
               <div className="relative group">
-                <button
+                {/* <button
                   type="button"
                   className="px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors inline-flex items-center gap-1"
                 >
                   Resources
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:rotate-180" />
-                </button>
+                </button> */}
                 {/* Dropdown Menu */}
-                <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-white shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all animate-in fade-in-50 zoom-in-95">
+                {/* <div className="absolute top-full left-0 mt-1 w-48 rounded-xl bg-white shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all animate-in fade-in-50 zoom-in-95">
                   <Link
                     href="/features#templates"
                     className="block px-3 py-2 text-xs font-medium text-slate-700 hover:bg-lavender-50 hover:text-lavender-700 rounded-lg"
@@ -310,7 +310,7 @@ export function Navbar() {
                   >
                     API &amp; Webhooks
                   </a>
-                </div>
+                </div> */}
               </div>
             </nav>
           )}

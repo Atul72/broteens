@@ -7,9 +7,10 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "404 - Page Not Found | Reachdesk",
+  title: "404 - Page Not Found",
   description:
     "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+  robots: { index: false, follow: false },
 };
 
 export default function NotFound() {
