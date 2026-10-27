@@ -93,6 +93,9 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   category: "technology",
+  verification: {
+    google: "Jg5sysU3ulgW4ENeGrxpXxHTqBBL31ZH1XRTxy_3fTI",
+  },
 };
 
 export default function RootLayout({
